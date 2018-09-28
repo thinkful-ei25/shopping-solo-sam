@@ -1,15 +1,18 @@
 'use strict';
 /*eslint */
 
-const STORE = [
-    {name: 'apples', checked: false},
-    {name: 'oranges', checked: false},
-    {name: 'milk', checked: true},
-    {name: 'bread', checked: false}
-];
+const STORE = {
+    items: [
+        {name: 'apples', checked: false},
+        {name: 'oranges', checked: false},
+        {name: 'milk', checked: true},
+        {name: 'bread', checked: false}
+    ],
+    hideCompleted: false,
+};
 
 
-function generateItemElement(item, itemIndex, template) {
+function generateItemElement(item, itemIndex) {
     return `
     <li class="js-item-index-element" data-item-index="${itemIndex}">
       <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
@@ -20,6 +23,9 @@ function generateItemElement(item, itemIndex, template) {
         <button class="shopping-item-delete js-item-delete">
             <span class="button-label">delete</span>
         </button>
+        <button class="shopping-item-edit js-item-edit">
+            <span class="button-label">edit</span>
+        </button>
       </div>
     </li>`;
 }
@@ -27,17 +33,22 @@ function generateItemElement(item, itemIndex, template) {
 
 function generateShoppingItemsString(shoppingList) {
     console.log('Generating shopping list element');
-
+    
     const items = shoppingList.map((item, index) => generateItemElement(item, index));
-  
+    
     return items.join('');
 }
 
 
 function renderShoppingList() {
+    let filteredItems = [ ...STORE.items ];
+    if(STORE.hideCompleted){
+        filteredItems = filteredItems.filter(item => !item.checked);
+    }
+    
     // render the shopping list in the DOM
     console.log('`renderShoppingList` ran');
-    const shoppingListItemsString = generateShoppingItemsString(STORE);
+    const shoppingListItemsString = generateShoppingItemsString(filteredItems);
 
     // insert that HTML into the DOM
     $('.js-shopping-list').html(shoppingListItemsString);
@@ -46,7 +57,7 @@ function renderShoppingList() {
 
 function addItemToShoppingList(itemName) {
     console.log(`Adding "${itemName}" to shopping list`);
-    STORE.push({name: itemName, checked: false});
+    STORE.items.push({name: itemName, checked: false});
 }
 
 function handleNewItemSubmit() {
@@ -61,9 +72,35 @@ function handleNewItemSubmit() {
     });
 }
 
+/* function searchShoppingList(itemName){
+
+} 
+
+function handleItemSearch(){
+    $('#js-shopping-list-form-search').submit(function(event) {
+        event.preventDefault();
+        console.log('`handleItemSearch` ran');
+        const searchName = $(.'js-shopping-list-entry').val();
+        searchShoppingList(searchName);
+        renderShoppingList();
+    })
+}
+ */
+
+function toggleHideItems(){
+    STORE.hideCompleted= !STORE.hideCompleted;
+}
+
+function handleToggleHideClick(){
+    $('#toggle-completed-filter').click(() => {
+        toggleHideItems();
+        renderShoppingList();
+    });
+}
+
 function toggleCheckedForListItem(itemIndex) {
     console.log('Toggling checked property for item at index ' + itemIndex);
-    STORE[itemIndex].checked = !STORE[itemIndex].checked;
+    STORE.items[itemIndex].checked = !STORE.items[itemIndex].checked;
 }
 
 
@@ -86,7 +123,7 @@ function handleItemCheckClicked() {
 
 function removeListItem(itemIndex){
     console.log('Removing item from shopping list at index' + itemIndex);
-    STORE.splice(itemIndex,1);
+    STORE.items.splice(itemIndex,1);
 }
 
 function handleDeleteItemClicked() {
@@ -108,6 +145,7 @@ function handleShoppingList() {
     handleNewItemSubmit();
     handleItemCheckClicked();
     handleDeleteItemClicked();
+    handleToggleHideClick();
 }
 
 // when the page loads, call `handleShoppingList`
