@@ -18,7 +18,7 @@ function generateItemElement(item, itemIndex) {
     <li class="js-item-index-element" data-item-index="${itemIndex}">
       <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
       <form class="js-edit-form hidden">
-            <input type="text" name="edit-list-entry" class="edit-input-${itemIndex}" placeholder="${item.name}">
+            <input type="text" name="edit-list-entry" class="edit-input-${itemIndex}" placeholder="Enter edit...">
             <button type="submit" class="js-submit-edit">Confirm?</button>
       </form>
       <div class="shopping-item-controls">
@@ -153,8 +153,7 @@ function editListItem(name,index){
 function handleOpenEditItemClicked(){
     $('.js-shopping-list').on('click', '.js-item-edit', event => {
         console.log('`handleOpenEditItemClicked` ran');
-        const hiddenForm= $(event.currentTarget).closest('li').find('.hidden');
-        console.log(hiddenForm);
+        const hiddenForm = $(event.currentTarget).closest('li').find('.hidden');
         hiddenForm.removeClass('hidden');
     });
 }
@@ -166,7 +165,7 @@ function handleSubmitEditItemClicked(){
         console.log('`handleSubmitEditItemClicked` ran');
         const itemIndex = getItemIndexFromElement(event.currentTarget);
         const editedName = $('.edit-input-'+itemIndex).val();
-        if(editedName === '') return;
+        if(editedName === '') {renderShoppingList();return;}
         console.log(editedName);
         editListItem(editedName,itemIndex);
         renderShoppingList();
