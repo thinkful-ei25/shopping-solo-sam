@@ -17,9 +17,9 @@ function generateItemElement(item, itemIndex) {
     return `
     <li class="js-item-index-element" data-item-index="${itemIndex}">
       <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
-      <form class="js-edit-form">
-            <input type="text" name="edit-list-entry" class="edit-input" placeholder="Edit...">
-            <button type="submit">Confirm?</button>
+      <form class="js-edit-form hidden">
+            <input type="text" name="edit-list-entry" class="edit-input-${itemIndex}" placeholder="${item.name}">
+            <button type="submit" class="js-submit-edit">Confirm?</button>
       </form>
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
@@ -144,7 +144,7 @@ function handleDeleteItemClicked() {
 // item name edited and updated
 
 function editListItem(name,index){
-    console.log('Editing item in shopping list at index' + index);
+    console.log('Editing item in shopping list at index ' + index);
     STORE.items[index].name = name;
 }
 
@@ -152,16 +152,24 @@ function editListItem(name,index){
 
 function handleOpenEditItemClicked(){
     $('.js-shopping-list').on('click', '.js-item-edit', event => {
-        console.log('`handleEditItemClicked` ran');
-        const hiddenForm= $(this).closest('li').find('form');
+        console.log('`handleOpenEditItemClicked` ran');
+        const hiddenForm= $(event.currentTarget).closest('li').find('.hidden');
+        console.log(hiddenForm);
         hiddenForm.removeClass('hidden');
-        
     });
 }
 
+
 function handleSubmitEditItemClicked(){
-    $('.js-edit-form').on('click', event => {
-        editListItem(name,index);
+    $('.js-shopping-list').on('click', '.js-submit-edit', event => {
+        event.preventDefault();
+        console.log('`handleSubmitEditItemClicked` ran');
+        const itemIndex = getItemIndexFromElement(event.currentTarget);
+        const editedName = $('.edit-input-'+itemIndex).val();
+        if(editedName === '') return;
+        console.log(editedName);
+        editListItem(editedName,itemIndex);
+        renderShoppingList();
     });
 }
 
