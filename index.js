@@ -85,7 +85,7 @@ function handleItemCheckClicked() {
 
 function removeListItem(itemIndex){
     console.log('Removing item from shopping list at index' + itemIndex);
-    STORE[itemIndex].remove();
+    STORE.splice(itemIndex,1);
 }
 
 function handleDeleteItemClicked() {
