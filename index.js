@@ -1,5 +1,5 @@
 'use strict';
-/*eslint */
+/*eslint-env jquery */
 
 const STORE = {
     items: [
@@ -9,6 +9,7 @@ const STORE = {
         {name: 'bread', checked: false}
     ],
     hideCompleted: false,
+    searchTerm : ''
 };
 
 
@@ -16,6 +17,10 @@ function generateItemElement(item, itemIndex) {
     return `
     <li class="js-item-index-element" data-item-index="${itemIndex}">
       <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
+      <form class="js-edit-form">
+            <input type="text" name="edit-list-entry" class="edit-input" placeholder="Edit...">
+            <button type="submit">Confirm?</button>
+      </form>
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
             <span class="button-label">check</span>
@@ -41,16 +46,12 @@ function generateShoppingItemsString(shoppingList) {
 
 
 function renderShoppingList() {
+    //filterd by checked
     let filteredItems = [ ...STORE.items ];
-    if(STORE.hideCompleted){
-        filteredItems = filteredItems.filter(item => !item.checked);
-    }
-    
-    // render the shopping list in the DOM
+    if(STORE.hideCompleted)filteredItems = filteredItems.filter(item => !item.checked);
+    let filteredSearchItems = filteredItems.filter(item => item.name.includes(STORE.searchTerm));
     console.log('`renderShoppingList` ran');
-    const shoppingListItemsString = generateShoppingItemsString(filteredItems);
-
-    // insert that HTML into the DOM
+    const shoppingListItemsString = generateShoppingItemsString(filteredSearchItems);
     $('.js-shopping-list').html(shoppingListItemsString);
 }
 
@@ -72,20 +73,20 @@ function handleNewItemSubmit() {
     });
 }
 
-/* function searchShoppingList(itemName){
-
+function searchShoppingList(itemName){
+    STORE.searchTerm = itemName;
 } 
 
 function handleItemSearch(){
     $('#js-shopping-list-form-search').submit(function(event) {
         event.preventDefault();
         console.log('`handleItemSearch` ran');
-        const searchName = $(.'js-shopping-list-entry').val();
+        const searchName = $('.js-shopping-list-search').val();
+        $('.js-shopping-list-search').val('');
         searchShoppingList(searchName);
         renderShoppingList();
-    })
+    });
 }
- */
 
 function toggleHideItems(){
     STORE.hideCompleted= !STORE.hideCompleted;
@@ -94,6 +95,7 @@ function toggleHideItems(){
 function handleToggleHideClick(){
     $('#toggle-completed-filter').click(() => {
         toggleHideItems();
+        console.log('Toggled completed items');
         renderShoppingList();
     });
 }
@@ -136,6 +138,33 @@ function handleDeleteItemClicked() {
     
 }
 
+// user clicks edit to prompt edit input
+// user puts in new item name to edit
+// user clicks edit item button to confirm changes
+// item name edited and updated
+
+function editListItem(name,index){
+    console.log('Editing item in shopping list at index' + index);
+    STORE.items[index].name = name;
+}
+
+
+
+function handleOpenEditItemClicked(){
+    $('.js-shopping-list').on('click', '.js-item-edit', event => {
+        console.log('`handleEditItemClicked` ran');
+        const hiddenForm= $(this).closest('li').find('form');
+        hiddenForm.removeClass('hidden');
+        
+    });
+}
+
+function handleSubmitEditItemClicked(){
+    $('.js-edit-form').on('click', event => {
+        editListItem(name,index);
+    });
+}
+
 // this function will be our callback when the page loads. it's responsible for
 // initially rendering the shopping list, and activating our individual functions
 // that handle new item submission and user clicks on the "check" and "delete" buttons
@@ -143,9 +172,12 @@ function handleDeleteItemClicked() {
 function handleShoppingList() {
     renderShoppingList();
     handleNewItemSubmit();
+    handleItemSearch();
     handleItemCheckClicked();
     handleDeleteItemClicked();
     handleToggleHideClick();
+    handleOpenEditItemClicked();
+    handleSubmitEditItemClicked();
 }
 
 // when the page loads, call `handleShoppingList`

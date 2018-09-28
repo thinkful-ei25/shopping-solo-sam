@@ -13,6 +13,16 @@
   button:hover {
     cursor: pointer;
   }
+
+  form {
+    margin-bottom : 10px;
+    display: inline-block;
+    width : 250px; 
+  }
+
+  form button {
+    margin-top: 5px;
+  }
   
   .hidden {
     display: none;
