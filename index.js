@@ -54,6 +54,7 @@ function handleNewItemSubmit() {
         event.preventDefault();
         console.log('`handleNewItemSubmit` ran');
         const newItemName = $('.js-shopping-list-entry').val();
+        if(newItemName === '') return;
         $('.js-shopping-list-entry').val('');
         addItemToShoppingList(newItemName);
         renderShoppingList();
